@@ -1,5 +1,6 @@
 import gleam/dynamic/decode
 import gleam/http.{Get as GET, Post as POST}
+import gleam/http/response
 import gleam/json
 import gleam/result
 import gleam/string
@@ -19,7 +20,7 @@ pub fn handle_request(req: Request) -> Response {
   }
 }
 
-fn tags(req: wisp.Request) -> wisp.Response {
+fn tags(req: Request) -> Response {
   use <- wisp.require_method(req, GET)
 
   case ollama_api.get_tags() {
@@ -43,7 +44,7 @@ fn generate_request_decoder() -> decode.Decoder(GenerateRequest) {
   decode.success(GenerateRequest(model:, prompt:))
 }
 
-fn generate(req: wisp.Request) -> wisp.Response {
+fn generate(req: Request) -> Response {
   use <- wisp.require_method(req, POST)
   use json_body <- wisp.require_json(req)
 
@@ -77,7 +78,7 @@ fn generate(req: wisp.Request) -> wisp.Response {
   }
 }
 
-fn handle_api_error(err: ollama_api.ApiError) -> wisp.Response {
+fn handle_api_error(err: ollama_api.ApiError) -> Response {
   case err {
     ollama_api.FailedHttpCall(e) -> json_error(e, 500)
 
@@ -93,7 +94,7 @@ fn handle_api_error(err: ollama_api.ApiError) -> wisp.Response {
   }
 }
 
-fn json_error(err, code: Int) -> wisp.Response {
+fn json_error(err, code: Int) -> Response {
   let msg = err |> string.inspect
 
   json.object([#("error", json.string(msg))])
@@ -101,10 +102,7 @@ fn json_error(err, code: Int) -> wisp.Response {
   |> wisp.json_response(code)
 }
 
-fn middleware(
-  req: wisp.Request,
-  handle_request: fn(wisp.Request) -> wisp.Response,
-) -> wisp.Response {
+fn middleware(req: Request, handle_request: fn(Request) -> Response) -> Response {
   // Log information about the request and response.
   use <- wisp.log_request(req)
 
@@ -114,5 +112,20 @@ fn middleware(
   // Rewrite HEAD requests to GET requests and return an empty body.
   use req <- wisp.handle_head(req)
 
-  handle_request(req)
+  handle_request(req) |> add_dev_cors_headers
+}
+
+fn add_dev_cors_headers(resp: Response) -> Response {
+  resp
+  |> response.set_header("Access-Control-Allow-Origin", "http://localhost:3000")
+  |> response.set_header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS",
+  )
+  |> response.set_header(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization",
+  )
+  |> response.set_header("Access-Control-Allow-Credentials", "true")
+  |> response.set_header("Access-Control-Max-Age", "86400")
 }

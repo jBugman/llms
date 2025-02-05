@@ -4,9 +4,11 @@
     "dictionaryDefinitions": [],
     "dictionaries": [],
     "words": [
+        "daisyui",
         "httpc",
         "llms",
-        "ollama"
+        "ollama",
+        "vite"
     ],
     "ignoreWords": [],
     "import": []
