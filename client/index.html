@@ -1,93 +1,106 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="business">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LLM Chat Interface</title>
-    <link rel="stylesheet" type="text/css" href="/src/input.css">
-</head>
-<body class="min-h-screen bg-base-200">
-    <div class="drawer lg:drawer-open">
-        <input id="drawer-toggle" type="checkbox" class="drawer-toggle" />
-        
-        <div class="drawer-content flex flex-col">
-            <!-- Top navbar for mobile -->
-            <div class="navbar lg:hidden bg-base-100">
-                <div class="flex-none">
-                    <label for="drawer-toggle" class="btn btn-square btn-ghost drawer-button">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 stroke-current">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </label>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/svg+xml" href="/icon.svg">
+        <title>Local LLM Chat</title>
+        <link rel="stylesheet" type="text/css" href="/src/input.css">
+        <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    </head>
+    <body class="min-h-screen bg-base-200">
+        <div class="drawer drawer-open">
+            <input id="drawer-toggle" type="checkbox" class="drawer-toggle" />
+
+            <div class="drawer-content flex flex-col">
+                <div class="navbar lg:hidden bg-base-100">
+                    <div class="flex-none">
+                        <label for="drawer-toggle" class="btn btn-square btn-ghost drawer-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                class="inline-block w-5 h-5 stroke-current">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </label>
+                    </div>
+                    <div class="flex-1">
+                        <span class="text-xl font-bold">Local LLM Chat</span>
+                    </div>
                 </div>
-                <div class="flex-1">
-                    <span class="text-xl font-bold">LLM Chat</span>
+
+                <!-- Main chat area with max width container -->
+                <div class="flex-1 flex justify-center">
+                    <div class="max-w-5xl w-full flex flex-col h-screen grow gap-4 justify-between">
+                        <!-- Chat messages container -->
+                        <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                            <!-- User Message -->
+                            <div class="chat chat-end">
+                                <div class="chat-bubble chat-bubble-neutral">Can you explain how to use Gleam?</div>
+                            </div>
+
+                            <!-- AI Message -->
+                            <div class="chat chat-start">
+                                You want X lines of text. Anything after
+                                that: gracefully cut off. That’s “line clamping” and it is a perfectly legit desire.
+                                When you can count on the text being a certain number of lines, you can create
+                                stronger and more reliable grids from the elements that contain that text, as well
+                                as achieve some symmetric aesthetic harmony.
+                            </div>
+                            <div class="chat chat-start">
+                                <span class="loading loading-dots loading-sm"></span>
+                            </div>
+                        </div>
+
+                        <!-- Input area -->
+                        <div class="p-4 pb-2 card w-full shadow-sm gap-2 grow-0 justify-end">
+                            <textarea
+                                id="user_input"
+                                class="textarea textarea-bordered text-lg flex-1 w-full overflow-y-auto resize-none"
+                                placeholder="Type your message here…"
+                                rows="4"></textarea>
+                            <div class="flex justify-between place-items-start">
+                                <select
+                                    class="select select-ghost pl-0 w-auto">
+                                    <option>o3-mini</option>
+                                    <option>deepseek-r1</option>
+                                </select>
+                                <button class="btn btn-warning">
+                                    <img src="/send-icon.svg" alt="Send icon" class="fill-current">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Main chat area with max width container -->
-            <div class="flex-1 flex justify-center">
-                <div class="max-w-3xl w-full flex flex-col h-screen">
-                    <!-- Chat messages container -->
-                    <div class="flex-1 overflow-y-auto p-4 space-y-4">
-                        <!-- AI Message -->
-                        <div class="chat chat-start">
-                            <div class="chat-bubble chat-bubble-neutral">Hello! How can I help you today?</div>
-                        </div>
-                        
-                        <!-- User Message -->
-                        <div class="chat chat-end">
-                            <div class="chat-bubble chat-bubble-base">Can you explain how to use Gleam?</div>
-                        </div>
+            <!-- Sidebar content -->
+            <div class="drawer-side">
+                <label for="drawer-toggle" class="drawer-overlay"></label>
+                <div class="w-50 bg-base-100 h-full flex flex-col">
+                    <!-- Sidebar header -->
+                    <div class="p-4 border-b border-base-300">
+                        <button class="btn btn-warning w-full">New Chat</button>
                     </div>
 
-                    <!-- Input area -->
-                    <div class="p-4 bg-base-200 border-t border-base-300">
-                        <div class="flex gap-2">
-                            <textarea 
-                                class="textarea textarea-bordered flex-1" 
-                                placeholder="Type your message here..."
-                                rows="1"
-                            ></textarea>
-                            <button class="btn btn-warning">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                                </svg>
-                            </button>
+                    <!-- Chat list -->
+                    <div class="flex-1 overflow-y-auto">
+                        <div class="menu p-4 space-y-2">
+                            <div class="px-3 py-2 rounded-lg bg-base-300 hover:bg-base-300">
+                                <a class="line-clamp-2">
+                                    Gleam Programming Discussion
+                                </a>
+                            </div>
+                            <div class="px-3 py-2 rounded-lg hover:bg-base-300">
+                                <a
+                                    class="line-clamp-2">
+                                    Web Development Tips Web Development Tips Web Development Tips Web Development
+                                    Tips
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Sidebar content -->
-        <div class="drawer-side">
-            <label for="drawer-toggle" class="drawer-overlay"></label>
-            <div class="w-80 bg-base-100 h-full flex flex-col">
-                <!-- Sidebar header -->
-                <div class="p-4 border-b border-base-300">
-                    <button class="btn btn-warning w-full">New Chat</button>
-                </div>
-
-                <!-- Chat list -->
-                <div class="flex-1 overflow-y-auto">
-                    <div class="menu p-4 space-y-2">
-                        <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-base-300 hover:bg-base-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
-                            </svg>
-                            Gleam Programming Discussion
-                        </a>
-                        <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-base-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
-                            </svg>
-                            Web Development Tips
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
+    </body>
 </html>
