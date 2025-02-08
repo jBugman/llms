@@ -13,7 +13,7 @@ pub fn page_layout(title: String, body: Element(a)) -> Element(a) {
       link([rel("icon"), type_("image/svg+xml"), href("/static/favicon.svg")]),
       h.title([], title),
       link([rel("stylesheet"), type_("text/css"), href("/static/main.css")]),
-      script([src("https://unpkg.com/htmx.org@2.0.4")], ""),
+      script([src("/static/htmx.min.js")], ""),
     ]),
     h.body([class("min-h-screen bg-base-200")], [body]),
   ])

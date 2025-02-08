@@ -7,3 +7,4 @@ test/test.http
 .env
 node_modules/
 priv/static/main.css
+priv/static/htmx.min.js
