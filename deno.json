@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "tailwind": "deno run -A --node-modules-dir npm:@tailwindcss/cli -i ./root.css -o ./priv/static/main.css --watch"
+  },
+  "imports": {
+    "@tailwindcss/cli": "npm:@tailwindcss/cli@^4.0.4",
+    "daisyui": "npm:daisyui@^5.0.0-beta.7",
+    "tailwindcss": "npm:tailwindcss@^4.0.4"
+  }
+}

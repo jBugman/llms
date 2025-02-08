@@ -1,16 +1,20 @@
 import gleam/http/response
 import wisp.{type Request, type Response}
 
-import http/api
-import http/htmx/chat_page
+import web/api
+import web/context.{type Context}
+import web/pages/chat_page/chat_page
 
-pub fn handle_request(req: Request) -> Response {
-  use req <- middleware(req)
+const auth_cookie_name = "llms_session"
+
+pub fn handle_request(req: Request, make_context: fn() -> Context) -> Response {
+  let ctx = make_context()
+  use req <- middleware(req, ctx)
 
   case wisp.path_segments(req) {
-    ["htmx", "model_names"] -> chat_page.model_names(req)
+    [] -> chat_page.index(req)
 
-    ["htmx", "post_message"] -> chat_page.post_message(req)
+    ["htmx", "post_message"] -> chat_page.post_message_htmx(req)
 
     ["api", "tags"] -> api.tags(req)
 
@@ -20,7 +24,11 @@ pub fn handle_request(req: Request) -> Response {
   }
 }
 
-fn middleware(req: Request, handle_request: fn(Request) -> Response) -> Response {
+fn middleware(
+  req: Request,
+  ctx: Context,
+  handle_request: fn(Request) -> Response,
+) -> Response {
   // Log information about the request and response.
   use <- wisp.log_request(req)
 
@@ -30,7 +38,18 @@ fn middleware(req: Request, handle_request: fn(Request) -> Response) -> Response
   // Rewrite HEAD requests to GET requests and return an empty body.
   use req <- wisp.handle_head(req)
 
-  handle_request(req) |> add_dev_cors_headers
+  use <- wisp.serve_static(req, under: "/static", from: ctx.static_path)
+
+  let user_id = case wisp.get_cookie(req, auth_cookie_name, wisp.Signed) {
+    Ok(cookie) -> cookie
+    Error(_) -> wisp.random_string(32)
+  }
+
+  wisp.log_debug("user_id: " <> user_id)
+
+  handle_request(req)
+  |> add_dev_cors_headers
+  |> wisp.set_cookie(req, auth_cookie_name, user_id, wisp.Signed, 60 * 60 * 24)
 }
 
 fn add_dev_cors_headers(resp: Response) -> Response {

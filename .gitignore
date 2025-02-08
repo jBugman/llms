@@ -5,3 +5,5 @@ erl_crash.dump
 test/test.json
 test/test.http
 .env
+node_modules/
+priv/static/main.css
