@@ -2,11 +2,16 @@ import gleam/http/response
 import wisp.{type Request, type Response}
 
 import http/api
+import http/htmx/chat_page
 
 pub fn handle_request(req: Request) -> Response {
   use req <- middleware(req)
 
   case wisp.path_segments(req) {
+    ["htmx", "model_names"] -> chat_page.model_names(req)
+
+    ["htmx", "post_message"] -> chat_page.post_message(req)
+
     ["api", "tags"] -> api.tags(req)
 
     ["api", "generate"] -> api.generate(req)

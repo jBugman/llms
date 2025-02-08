@@ -30,9 +30,9 @@
 
                 <!-- Main chat area with max width container -->
                 <div class="flex-1 flex justify-center">
-                    <div class="max-w-5xl w-full flex flex-col h-screen grow gap-4 justify-between">
+                    <div class="max-w-5xl w-full flex flex-col h-screen grow gap-4">
                         <!-- Chat messages container -->
-                        <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                        <div id="chat_messages" class="flex-1 overflow-y-auto p-4 space-y-4">
                             <!-- User Message -->
                             <div class="chat chat-end">
                                 <div class="chat-bubble chat-bubble-neutral">Can you explain how to use Gleam?</div>
@@ -46,29 +46,41 @@
                                 stronger and more reliable grids from the elements that contain that text, as well
                                 as achieve some symmetric aesthetic harmony.
                             </div>
-                            <div class="chat chat-start">
+
+                            <div id="thinking_indicator" class="chat chat-start htmx-indicator">
                                 <span class="loading loading-dots loading-sm"></span>
                             </div>
                         </div>
 
                         <!-- Input area -->
-                        <div class="p-4 pb-2 card w-full shadow-sm gap-2 grow-0 justify-end">
+                        <form class="p-4 pb-2 card w-full shadow-sm gap-2 grow-0 justify-end"
+                            hx-post="/post_message"
+                            hx-target="#thinking_indicator"
+                            hx-swap="outerHTML"
+                            hx-indicator="#thinking_indicator">
                             <textarea
                                 id="user_input"
+                                name="message"
                                 class="textarea textarea-bordered text-lg flex-1 w-full overflow-y-auto resize-none"
                                 placeholder="Type your message here…"
                                 rows="4"></textarea>
                             <div class="flex justify-between place-items-start">
                                 <select
-                                    class="select select-ghost pl-0 w-auto">
+                                    id="model_names"
+                                    name="model_name"
+                                    class="select select-ghost pl-0 w-auto"
+                                    hx-get="/model_names"
+                                    hx-target="#model_names"
+                                    hx-swap="innerHTML"
+                                    hx-trigger="load once">
                                     <option>o3-mini</option>
                                     <option>deepseek-r1</option>
                                 </select>
-                                <button class="btn btn-warning">
+                                <button class="btn btn-warning" type="submit">
                                     <img src="/send-icon.svg" alt="Send icon" class="fill-current">
                                 </button>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -103,4 +115,11 @@
             </div>
         </div>
     </body>
+    <script>
+        htmx.config.selfRequestsOnly = false;
+
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.path = `http://localhost:8000/htmx${event.detail.path}`
+        });
+    </script>
 </html>

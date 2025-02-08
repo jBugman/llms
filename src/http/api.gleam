@@ -21,7 +21,7 @@ pub fn tags(req: Request) -> Response {
   }
 }
 
-type GenerateRequest {
+pub type GenerateRequest {
   GenerateRequest(model: String, prompt: String)
 }
 
