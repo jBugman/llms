@@ -1,14 +1,62 @@
+import gleam/http/request
 import gleam/http/response
-import wisp.{type Request, type Response}
+import gleam/option.{type Option, None, Some}
+import mist
+import wisp
+import wisp/wisp_mist
 
 import web/api
-import web/context.{type Context}
+import web/auth
+import web/context.{type Context, Context}
 import web/pages/chat_page/chat_page
+import web/pages/chat_page/sse
 
 const auth_cookie_name = "llms_session"
 
-pub fn handle_request(req: Request, make_context: fn() -> Context) -> Response {
-  let ctx = make_context()
+pub fn handle_request(
+  req: request.Request(mist.Connection),
+  ctx: Context,
+  secret_key_base: String,
+) -> response.Response(mist.ResponseData) {
+  let session_id = auth.get_session_id(req, secret_key_base)
+
+  // case session_id {
+  //   Some(session_id) -> {
+  //     let ctx = Context(..ctx, session_id:)
+  //     handle_authorized_request(req, ctx, secret_key_base)
+  //   }
+  //   None -> {
+  //     // response.Response()
+  //     resp |> auth.set_cookie(ctx.session_id, secret_key_base)
+  //   }
+  // }
+  todo
+}
+
+// fn auth_middleware(
+//   req: request.Request(mist.Connection),
+//   ctx: Context,
+//   secret_key_base: String,
+// ) -> response.Response(mist.ResponseData) {
+//   case request.path_segments(req) {
+//     ["login"] -> {
+//       todo
+//     }
+//   }
+// }
+
+// fn handle_authorized_request(
+//   req: Request,
+//   ctx: Context,
+//   secret_key_base: String,
+// ) -> Response {
+//   case request.path_segments(req) {
+//     ["sse", "generation"] -> sse.handle_request(req, ctx)
+//     _ -> wisp_mist.handler(handle_request_wisp(_, ctx), secret_key_base)(req)
+//   }
+// }
+
+pub fn handle_request_wisp(req: wisp.Request, ctx: Context) -> wisp.Response {
   use req <- middleware(req, ctx)
 
   case wisp.path_segments(req) {
@@ -25,10 +73,10 @@ pub fn handle_request(req: Request, make_context: fn() -> Context) -> Response {
 }
 
 fn middleware(
-  req: Request,
+  req: wisp.Request,
   ctx: Context,
-  handle_request: fn(Request) -> Response,
-) -> Response {
+  handle_request: fn(wisp.Request) -> wisp.Response,
+) -> wisp.Response {
   // Log information about the request and response.
   use <- wisp.log_request(req)
 
@@ -52,7 +100,7 @@ fn middleware(
   |> wisp.set_cookie(req, auth_cookie_name, user_id, wisp.Signed, 60 * 60 * 24)
 }
 
-fn add_dev_cors_headers(resp: Response) -> Response {
+fn add_dev_cors_headers(resp: wisp.Response) -> wisp.Response {
   resp
   |> response.set_header("Access-Control-Allow-Origin", "http://localhost:3000")
   |> response.set_header(
