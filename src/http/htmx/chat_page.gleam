@@ -3,6 +3,9 @@ import gleam/list
 import gleam/result.{try}
 import gleam/string
 import gleam/string_tree.{type StringTree}
+import lustre/attribute as a
+import lustre/element.{type Element}
+import lustre/element/html
 import wisp.{type Request, type Response}
 
 import http/api.{type GenerateRequest, GenerateRequest}
@@ -21,10 +24,13 @@ pub fn post_message(req: Request) -> Response {
       request.model,
       request.prompt,
     ))
-    completion
-    |> llm_message_html
-    |> string_tree.prepend_tree(user_message_html(request.prompt))
-    |> string_tree.append_tree(thinking_placeholder())
+
+    element.fragment([
+      user_message_html(request.prompt),
+      llm_message_html(completion),
+      thinking_placeholder(),
+    ])
+    |> element.to_string_builder
     |> Ok
   }
 
@@ -68,29 +74,21 @@ pub fn model_names(req: Request) -> Response {
   }
 }
 
-fn llm_message_html(message: String) -> StringTree {
-  ["<div class=\"chat chat-start\">", message, "</div>"]
-  |> string.join("")
-  |> string_tree.from_string
+fn llm_message_html(message: String) -> Element(a) {
+  html.div([a.class("chat chat-start")], [html.text(message)])
 }
 
-fn user_message_html(message: String) -> StringTree {
-  [
-    "<div class=\"chat chat-end\">",
-    "<div class=\"chat-bubble chat-bubble-neutral\">",
-    message,
-    "</div>",
-    "</div>",
-  ]
-  |> string.join("")
-  |> string_tree.from_string
+fn user_message_html(message: String) -> Element(a) {
+  html.div([a.class("chat chat-end")], [
+    html.div([a.class("chat-bubble chat-bubble-neutral")], [html.text(message)]),
+  ])
 }
 
-fn thinking_placeholder() -> StringTree {
-  "<div id=\"thinking_indicator\" class=\"chat chat-start htmx-indicator\">
-    <span class=\"loading loading-dots loading-sm\"></span>
-  </div>"
-  |> string_tree.from_string
+fn thinking_placeholder() -> Element(a) {
+  html.div(
+    [a.id("thinking_indicator"), a.class("chat chat-start htmx-indicator")],
+    [html.span([a.class("loading loading-dots loading-sm")], [])],
+  )
 }
 
 fn model_names_html(model_names: List(String)) -> StringTree {
