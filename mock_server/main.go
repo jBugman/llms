@@ -1,7 +1,8 @@
-package main
+package mock
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
@@ -42,10 +43,13 @@ func handleGenerate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func main() {
+func ListenAndServe() {
 	http.HandleFunc("/api/generate", handleGenerate)
 
-	http.ListenAndServe(":11434", nil)
+	slog.Info("starting mock server", slog.Int("port", 11434))
+	if err := http.ListenAndServe(":11434", nil); err != nil {
+		slog.Error("failed to start server", slog.Any("error", err))
+	}
 }
 
 func respond(w http.ResponseWriter, message string) {
