@@ -7,7 +7,7 @@ import (
 
 func Router() http.Handler {
 	r := http.NewServeMux()
-	r.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("priv/static"))))
+	r.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
 	r.HandleFunc("GET /{$}", handleIndex)
 	return logger(r)
 }
