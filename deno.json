@@ -1,7 +1,7 @@
 {
   "tasks": {
-    "tailwind": "deno run -RWE --allow-ffi npm:@tailwindcss/cli -i ./root.css -o ./priv/static/main.css --watch",
-    "htmx": "curl -o priv/static/htmx.min.js https://unpkg.com/htmx.org@2.0.4"
+    "tailwind": "deno run -RWE --allow-ffi npm:@tailwindcss/cli -i ./tailwind.css -o ./web/static/main.css --watch",
+    "htmx": "curl -Lo ./web/static/htmx.min.js https://unpkg.com/htmx.org@2.0.4"
   },
   "imports": {
     "@tailwindcss/cli": "npm:@tailwindcss/cli@^4.0.4",
