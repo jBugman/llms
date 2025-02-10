@@ -1,9 +1,12 @@
 package web
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/google/uuid"
+
+	"llms/ollama"
 )
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +34,12 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	models := []string{"o3-mini", "deepseek-r1"}
+	models, err := ollama.Tags()
+	if err != nil {
+		slog.Error("failed to get ollama tags", slog.Any("error", err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
 	body := bodyEl(messages, models, chats)
 

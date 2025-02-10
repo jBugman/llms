@@ -22,9 +22,9 @@ type chatMessage struct {
 	isUser bool
 }
 
-func bodyEl(
+func bodyEl[M ~string](
 	messages []chatMessage,
-	models []string,
+	models []M,
 	chats []chatListItem,
 ) Node {
 	return Div(Class("drawer drawer-open"),
@@ -68,7 +68,7 @@ func thinking() Node {
 	)
 }
 
-func inputForm(models []string) Node {
+func inputForm[T ~string](models []T) Node {
 	return Form(
 		Class("p-4 pb-2 card w-full shadow-sm gap-2 grow-0 justify-end"),
 		hx.Post("/htmx/post_message"),
@@ -95,13 +95,13 @@ func inputForm(models []string) Node {
 	)
 }
 
-func modelsSelect(names []string) Node {
+func modelsSelect[T ~string](names []T) Node {
 	return Select(
 		ID("model_names"),
 		Name("model_name"),
 		Class("select select-ghost pl-0 w-auto"),
-		Map(names, func(name string) Node {
-			return Option(Text(name))
+		Map(names, func(name T) Node {
+			return Option(Text(string(name)))
 		}),
 	)
 }

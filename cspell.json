@@ -1,6 +1,8 @@
 {
     "version": "0.2",
-    "ignorePaths": [],
+    "ignorePaths": [
+        "go.sum"
+    ],
     "dictionaryDefinitions": [],
     "dictionaries": [],
     "words": [
@@ -8,9 +10,12 @@
         "gomponents",
         "httpc",
         "llms",
+        "lmittmann",
         "maragu",
+        "oklog",
         "ollama",
-        "vite"
+        "vite",
+        "Wrapf"
     ],
     "ignoreWords": [],
     "import": []

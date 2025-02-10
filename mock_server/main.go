@@ -25,6 +25,8 @@ const markdownResponse = `# Demo
 **Hello from LLM!** this is [markdown](https://markdownguide.org)`
 
 func handleGenerate(w http.ResponseWriter, r *http.Request) {
+	slog.Debug("ollama /api/generate")
+
 	var request Request
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -43,8 +45,30 @@ func handleGenerate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleTags(w http.ResponseWriter, r *http.Request) {
+	slog.Debug("ollama /api/tags")
+	const body = `{
+  "models": [
+    {
+      "name": "deepseek-r1:32b",
+      "model": "deepseek-r1:32b"
+    },
+    {
+      "name": "llama3.2:latest",
+      "model": "llama3.2:latest"
+    }
+  ]
+}`
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(body))
+}
+
 func ListenAndServe() {
 	http.HandleFunc("/api/generate", handleGenerate)
+
+	http.HandleFunc("/api/tags", handleTags)
 
 	slog.Info("starting mock server", slog.Int("port", 11434))
 	if err := http.ListenAndServe(":11434", nil); err != nil {
