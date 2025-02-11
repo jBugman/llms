@@ -6,7 +6,7 @@ import (
 )
 
 func pageLayout(title string, body Node) Node {
-	return HTML(Lang("en"),
+	return Doctype(HTML(Lang("en"), Attr("data-theme", "business"),
 		Head(
 			Meta(Charset("UTF-8")),
 			Meta(Name("viewport"), Content("width=device-width, initial-scale=1")),
@@ -16,5 +16,5 @@ func pageLayout(title string, body Node) Node {
 			Script(Src("/static/htmx.min.js")),
 		),
 		Body(Class("min-h-screen bg-base-200"), body),
-	)
+	))
 }

@@ -10,6 +10,9 @@ import (
 )
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
+	sessionID := getSessionID(r)
+	slog.Debug("index", slog.String("sessionID", sessionID))
+
 	chats := []chatListItem{
 		{
 			title:     "Gleam Programming Discussion",
