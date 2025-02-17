@@ -4,8 +4,8 @@
     "htmx": "curl -Lo ./web/static/htmx.min.js https://unpkg.com/htmx.org@2.0.4"
   },
   "imports": {
-    "@tailwindcss/cli": "npm:@tailwindcss/cli@^4.0.4",
+    "@tailwindcss/cli": "npm:@tailwindcss/cli@^4.0.6",
     "daisyui": "npm:daisyui@^5.0.0-beta.7",
-    "tailwindcss": "npm:tailwindcss@^4.0.4"
+    "tailwindcss": "npm:tailwindcss@^4.0.6"
   }
 }

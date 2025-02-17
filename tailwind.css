@@ -1,4 +1,4 @@
-@import "tailwindcss" source("./src/");
+@import "tailwindcss" source("./web/**/*.go");
 
 @plugin "daisyui" {
   themes: business --default;
